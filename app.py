@@ -19,6 +19,10 @@ st.write(
     "messy text, numbers stored as text, mixed date formats and impossible values, "
     "then gives you a clean file and a report of every change."
 )
+st.caption(
+    "🔒 Your file is processed in memory for this session only and deleted right after cleaning. "
+    "Nothing is saved. Please don't upload confidential or personal data you aren't allowed to share."
+)
 
 # ---------------- Settings (left sidebar)
 with st.sidebar:
@@ -67,7 +71,7 @@ with tempfile.TemporaryDirectory() as tmp:
         f.write(uploaded.getbuffer())
 
     # Preview the raw data
-    agent_preview = DataCleaningAgent()
+    agent_preview = DataCleaningAgent(verbose=False)
     try:
         raw = agent_preview.load(in_path)
     except Exception as e:
@@ -83,18 +87,16 @@ with tempfile.TemporaryDirectory() as tmp:
 
     if use_ai and not api_key:
         st.warning("AI is on but no API key was entered, so the agent will use its built-in rules only.")
-    if use_ai and api_key:
-        os.environ["ANTHROPIC_API_KEY"] = api_key
-
     with st.spinner("Cleaning..."):
-        agent = DataCleaningAgent(use_ai=use_ai and bool(api_key), missing_strategy=missing, outlier_action=outliers)
+        agent = DataCleaningAgent(
+            use_ai=use_ai and bool(api_key), missing_strategy=missing, outlier_action=outliers,
+            api_key=api_key or None, verbose=False,
+        )
         try:
             clean = agent.run(in_path, out_dir=tmp)
         except Exception as e:
             st.error(f"Something went wrong while cleaning: {e}")
             st.stop()
-        finally:
-            os.environ.pop("ANTHROPIC_API_KEY", None)
 
     with open(os.path.join(tmp, f"{base}_cleaning_report.md"), encoding="utf-8") as f:
         report = f.read()

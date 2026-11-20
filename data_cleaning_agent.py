@@ -51,8 +51,11 @@ US_STATES.update({"MINN": "Minnesota", "WIS": "Wisconsin", "WISC": "Wisconsin", 
 
 
 class DataCleaningAgent:
-    def __init__(self, use_ai=False, missing_strategy="fill", outlier_action="flag"):
+    def __init__(self, use_ai=False, missing_strategy="fill", outlier_action="flag",
+                 api_key=None, verbose=True):
         self.use_ai = use_ai
+        self.api_key = api_key      # passed directly, never stored in shared environment variables
+        self.verbose = verbose      # False in the web app, so users' data never appears in server logs
         self.missing_strategy = missing_strategy  # "fill" | "drop" | "keep"
         self.outlier_action = outlier_action      # "flag" | "remove" | "keep"
         self.log = []                              # every action, for the report
@@ -61,7 +64,8 @@ class DataCleaningAgent:
     # ------------------------------------------------------------------ helpers
     def note(self, step, message):
         self.log.append((step, message))
-        print(f"  [{step}] {message}")
+        if self.verbose:
+            print(f"  [{step}] {message}")
 
     @staticmethod
     def _is_text(series):
@@ -102,8 +106,9 @@ class DataCleaningAgent:
         except ImportError:
             self.note("ai", "anthropic package not installed - skipping AI step (pip install anthropic)")
             return {}
-        if not os.environ.get("ANTHROPIC_API_KEY"):
-            self.note("ai", "ANTHROPIC_API_KEY not set - skipping AI step")
+        key = self.api_key or os.environ.get("ANTHROPIC_API_KEY")
+        if not key:
+            self.note("ai", "No API key provided - skipping AI step")
             return {}
 
         prompt = f"""You are a data-cleaning assistant. Here is a profile of a dataset's columns
@@ -121,7 +126,7 @@ Return ONLY a JSON object with this shape (omit keys you have nothing for):
 Use value_mappings to merge spellings/abbreviations of the same thing
 (e.g. "MN", "Minn." -> "Minnesota"). Use the column names exactly as given."""
 
-        client = anthropic.Anthropic()
+        client = anthropic.Anthropic(api_key=key)
         resp = client.messages.create(
             model="claude-sonnet-5-5",
             max_tokens=4000,
@@ -406,7 +411,8 @@ Use value_mappings to merge spellings/abbreviations of the same thing
 
     # ------------------------------------------------------------------ 4. RUN + VALIDATE
     def run(self, in_path, out_dir=None):
-        print(f"\nData Cleaning Agent -> {in_path}\n")
+        if self.verbose:
+            print(f"\nData Cleaning Agent -> {in_path}\n")
         df = self.load(in_path)
         raw_shape = df.shape
         raw_blanks = int(df.map(lambda v: pd.isna(v) or str(v).strip().lower() in NULL_TOKENS).sum().sum())
@@ -430,7 +436,8 @@ Use value_mappings to merge spellings/abbreviations of the same thing
         out_md = os.path.join(out_dir, f"{base}_cleaning_report.md")
         df.to_csv(out_csv, index=False)
         self.write_report(out_md, in_path, raw_shape, raw_blanks, df)
-        print(f"\nDone. Clean data -> {out_csv}\n      Report     -> {out_md}\n")
+        if self.verbose:
+            print(f"\nDone. Clean data -> {out_csv}\n      Report     -> {out_md}\n")
         return df
 
     def write_report(self, path, in_path, raw_shape, raw_blanks, df):
