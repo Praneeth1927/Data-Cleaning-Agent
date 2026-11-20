@@ -1,0 +1,13 @@
+Customer ID,  Full Name ,E-mail,Phone Number,State,Signup Date,Age,Annual Spend,Active?,Notes
+101, john smith ,John.Smith@Gmail.com,612-555-0101,MN,2024-01-15,34,"$1,200",Yes,
+102,MARY JONES,mary.jones@yahoo.com,(651) 555-0102,Minnesota,01/22/2024,28,$850.50,yes,
+103,Raj Patel,raj.patel@outlook,6125550103,mn,2024/02/03,N/A,"2,300",Y,
+104,Linda Chen,linda.chen@gmail.com,+1 612 555 0104,Wisconsin,Feb 10 2024,45,$-,No,
+105,Carlos Diaz,carlos.diaz@gmail.com,612.555.0105,WI,2024-02-14,250,$975,no,
+101, john smith ,John.Smith@Gmail.com,612-555-0101,MN,2024-01-15,34,"$1,200",Yes,
+106,Emily Brown,,555-0106,wisconsin,2024-13-45,39,"$1,050",TRUE,
+107,ahmed khan,ahmed.khan@gmail.com,612-555-0107,Iowa,03/05/2024,,null,FALSE,
+,,,,,,,,,
+108,Sara Lee,sara.lee@gmail.com,612-555-0108,IA,2024-03-12,31,"$98,000",yes,
+109,Tom Wilson,tom.wilson@gmail.com,612-555-0109,iowa,2024-03-20,52,$1100,No,
+110,Priya Sharma,priya.sharma@gmail.com,612-555-0110,Minnesota ,2024-03-25,29,$990,Yes,
