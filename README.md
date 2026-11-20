@@ -20,6 +20,18 @@ A web app that takes a messy CSV, Excel or JSON file and returns clean, analysis
 | Extreme values | spend `$98,000` | kept, flagged for review |
 | Missing values | blank age | filled with the median |
 
+## Charts of your clean data
+
+After cleaning, the app automatically finds your date, number and category columns and draws:
+
+- **Trend over time:** a line chart by month (or by day for short date ranges)
+- **By category:** a bar chart of the top 10 values, with the rest grouped as "Other"
+- **Distributions:** a histogram plus average, median, smallest and largest values
+- **Build your own:** bar, line, histogram or scatter plot (with correlation), using columns you pick
+- **Data completeness:** how full each column is after cleaning
+
+One "What should the charts measure?" control switches every chart between row counts, totals and averages.
+
 ## How it works
 
 1. **Profile:** looks at every column (type, blanks, sample values)
@@ -46,4 +58,4 @@ Turn on **Use AI** in the sidebar and paste your own Anthropic API key. Claude t
 
 ## Built with
 
-Python · pandas · Streamlit · Claude API
+Python · pandas · Plotly · Streamlit · Claude API
